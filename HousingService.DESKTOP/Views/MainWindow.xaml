@@ -1,0 +1,116 @@
+﻿<Window x:Class="HousingService.DESKTOP.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HousingService.DESKTOP"
+        xmlns:vm="clr-namespace:HousingService.DESKTOP.ViewModels"
+        xmlns:models="clr-namespace:HousingService.DESKTOP.Models"
+        xmlns:converters="clr-namespace:HousingService.DESKTOP.Converters"
+        mc:Ignorable="d"
+        Title="Управление недвижимостью" Height="600" Width="800">
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:CurrentLevelToVisibilityConverter x:Key="LevelToVisibilityConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="Назад" Command="{Binding GoBackCommand}" Margin="0,0,10,0"/>
+            <TextBlock Text="Текущий уровень: " VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding CurrentLevel}" VerticalAlignment="Center" FontWeight="Bold"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1"
+          ItemsSource="{Binding Cities}"
+          SelectedItem="{Binding SelectedCity}"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          Visibility="{Binding CurrentLevel, Converter={StaticResource LevelToVisibilityConverter}, ConverterParameter=Города}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
+                <DataGridTextColumn Header="Город" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Домов" Binding="{Binding CountOfHouses}" Width="Auto"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding LoadStreetsCommand}" CommandParameter="{Binding SelectedCity}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+
+        <DataGrid Grid.Row="1"
+          ItemsSource="{Binding Streets}"
+          SelectedItem="{Binding SelectedStreet}"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          Visibility="{Binding CurrentLevel, Converter={StaticResource LevelToVisibilityConverter}, ConverterParameter=Улицы}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
+                <DataGridTextColumn Header="Улица" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Домов" Binding="{Binding CountOfHouses}" Width="Auto"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding LoadHousesCommand}" CommandParameter="{Binding SelectedStreet}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+
+        <DataGrid Grid.Row="1"
+          ItemsSource="{Binding Houses}"
+          SelectedItem="{Binding SelectedHouse}"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          Visibility="{Binding CurrentLevel, Converter={StaticResource LevelToVisibilityConverter}, ConverterParameter=Дома}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
+                <DataGridTextColumn Header="Полный адрес" Binding="{Binding FullAddress}" Width="*"/>
+                <DataGridTextColumn Header="Квартир" Binding="{Binding CountOfApartments}" Width="Auto"/>
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding LoadApartmentsByHouseCommand}" CommandParameter="{Binding SelectedHouse}"/>
+            </DataGrid.InputBindings>
+        </DataGrid>
+
+        <Grid Grid.Row="1"
+              Visibility="{Binding CurrentLevel, Converter={StaticResource LevelToVisibilityConverter}, ConverterParameter=Квартиры}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Мин. площадь:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+
+                <TextBox Width="80" 
+             Text="{Binding MinAreaFilter, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
+             Margin="0,0,10,0"/>
+
+                <TextBlock Text="Макс. площадь:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+
+                <TextBox Width="80" 
+             Text="{Binding MaxAreaFilter, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" 
+             Margin="0,0,10,0"/>
+            </StackPanel>
+
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Apartments}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Номер" Binding="{Binding Number}" Width="Auto"/>
+                    <DataGridTextColumn Header="Площадь" Binding="{Binding Area}" Width="Auto"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <TextBlock Grid.Row="2" Text="{Binding CurrentLevel}" HorizontalAlignment="Right" Margin="0,10,0,0" FontSize="10" Foreground="Gray"/>
+    </Grid>
+</Window>
